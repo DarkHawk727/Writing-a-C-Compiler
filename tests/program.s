@@ -1,3 +1,4 @@
+.globl main
 _main:
 	pushq  %rbp
 	movq  %rsp, %rbp
