@@ -70,7 +70,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(
             ast,
             Program(
-                main_func=Function(
+                function_definition=Function(
                     name=Identifier(name="main"),
                     body=Return(return_val=Constant(val=0)),
                 )
@@ -83,7 +83,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(
             ast,
             Program(
-                main_func=Function(
+                function_definition=Function(
                     name=Identifier(name="main"),
                     body=Return(return_val=Constant(val=100)),
                 )

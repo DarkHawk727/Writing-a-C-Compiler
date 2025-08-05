@@ -1,39 +1,14 @@
 import re
 from collections import namedtuple
-from typing import List
+from typing import List, NamedTuple
 
-TOKEN_REGEXES = {
-    "IDENTIFIER": re.compile(r"[a-zA-Z]\w*\b"),  # IDENTIFIER
-    "CONSTANT": re.compile(r"[0-9]+\b"),  # CONSTANT
-    "INT_KEYWORD": re.compile(r"int\b"),  # INTEGER
-    "VOID_KEYWORD": re.compile(r"void\b"),  # VOID
-    "RETURN": re.compile(r"return\b"),  # RETURN
-    "L_PAREN": re.compile(r"\("),  # L_PAREN
-    "R_PAREN": re.compile(r"\)"),  # R_PAREN
-    "L_BRACE": re.compile(r"{"),  # L_BRACE
-    "R_BRACE": re.compile(r"}"),  # R_BRACE
-    "SEMICOLON": re.compile(r";"),  # SEMICOLON
-}
+from lexer import TOKEN_REGEXES
 
-Program = namedtuple("Program", "main_func")
+Program = namedtuple("Program", "function_definition")
 Function = namedtuple("Function", ["name", "body"])
 Return = namedtuple("Return", "return_val")
 Constant = namedtuple("Constant", "val")
 Identifier = namedtuple("Identifier", "name")
-
-
-def create_pretty_tuple_str(obj, indent=0) -> str:
-    if not isinstance(obj, tuple):
-        return str(obj)
-
-    result = f"{type(obj).__name__}(\n"
-    for field in obj._fields:
-        value = getattr(obj, field)
-        result += f"{' ' * (indent + 2)}{field}="
-        result += create_pretty_tuple_str(value, indent + 2)
-        result += ",\n"
-    result += f"{' ' * indent})"
-    return result
 
 
 # This will remove the first element of tokens and pops it off. Modifies tokens

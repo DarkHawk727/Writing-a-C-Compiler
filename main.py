@@ -1,10 +1,35 @@
 #!/opt/homebrew/bin/python3.10
 import argparse
 import os
-from parser import create_pretty_tuple_str, parse_program
+from parser import parse_program
+from typing import NamedTuple
 
-from codegen import convert_AST_to_assembly
+from ast2asm import convert_AST_to_assembly
+from codegen import emit_assembly
 from lexer import lex
+
+
+def create_pretty_tuple_str(obj, indent=0) -> str:
+    spacer = " " * (indent + 2)
+    if isinstance(obj, list):
+        if not obj:
+            return "[]"
+        result = "[\n"
+        for item in obj:
+            result += spacer + create_pretty_tuple_str(item, indent + 2) + ",\n"
+        result += " " * (indent) + "]"
+        return result
+    elif isinstance(obj, tuple) and hasattr(obj, "_fields"):
+        result = f"{type(obj).__name__}(\n"
+        for field in obj._fields:
+            value = getattr(obj, field)
+            result += f"{spacer}{field}="
+            result += create_pretty_tuple_str(value, indent + 2)
+            result += ",\n"
+        result += " " * indent + ")"
+        return result
+    else:
+        return repr(obj)
 
 
 def main():
@@ -19,7 +44,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Check if the file exists
     if not os.path.isfile(args.file):
         print(f"Error: File '{args.file}' does not exist.")
         return
@@ -32,11 +56,16 @@ def main():
     elif args.stage == "parse":
         print(create_pretty_tuple_str(parse_program(lex(program))))
     elif args.stage == "codegen":
-        instructions = convert_AST_to_assembly(parse_program(lex(program)))
-        print("\n".join(instructions))
+        print(
+            create_pretty_tuple_str(
+                convert_AST_to_assembly(parse_program(lex(program)))
+            )
+        )
     elif args.stage == "compile":
         with open(f"{args.file[:-2]}.s", "w") as out:
-            for instruction in convert_AST_to_assembly(parse_program(lex(program))):
+            for instruction in emit_assembly(
+                convert_AST_to_assembly(parse_program(lex(program)))
+            ):
                 out.write(instruction + "\n")
 
 

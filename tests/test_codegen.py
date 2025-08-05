@@ -1,6 +1,6 @@
 import unittest
 
-from codegen import convert_AST_to_assembly
+from ast2asm import convert_AST_to_assembly
 from parser import Constant, Function, Identifier, Program, Return
 
 
