@@ -1,13 +1,16 @@
-from collections import namedtuple
 from parser import Constant, Function, Identifier, Program, Return
-from typing import List
+from typing import Any, List, NamedTuple
 
-AssemblyProgram = namedtuple("AssemblyProgram", "function_definition")
-AssemblyFunction = namedtuple("AssemblyFunction", ["name", "instructions"])
-AssemblyMov = namedtuple("AssemblyMov", ["exp", "Register"])
-AssemblyImmediate = namedtuple("AssemblyImmediate", "value")
-AssemblyPop = namedtuple("AssemblyPop", ["Register"])
-AssemblyRet = namedtuple("AssemblyRet", [])
+AssemblyFunction = NamedTuple(
+    "AssemblyFunction", [("name", str), ("instructions", List[Any])]
+)  # Should ideally remove the Any
+AssemblyProgram = NamedTuple(
+    "AssemblyProgram", [("function_definition", AssemblyFunction)]
+)
+AssemblyImmediate = NamedTuple("AssemblyImmediate", [("value", int | str)])
+AssemblyMov = NamedTuple("AssemblyMov", [("exp", AssemblyImmediate), ("Register", str)])
+AssemblyPop = NamedTuple("AssemblyPop", [("Register", str)])
+AssemblyRet = NamedTuple("AssemblyRet", [])
 
 
 def visit_program(node: Program) -> AssemblyProgram:

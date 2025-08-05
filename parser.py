@@ -1,82 +1,82 @@
 import re
-from collections import namedtuple
 from typing import List, NamedTuple
 
 from lexer import TOKEN_REGEXES
+from tokens import Token, TokenType
 
-Program = namedtuple("Program", "function_definition")
-Function = namedtuple("Function", ["name", "body"])
-Return = namedtuple("Return", "return_val")
-Constant = namedtuple("Constant", "val")
-Identifier = namedtuple("Identifier", "name")
+Constant = NamedTuple("Constant", [("val", int)])
+Identifier = NamedTuple("Identifier", [("name", str)])
+Return = NamedTuple("Return", [("return_val", Constant)])
+Function = NamedTuple("Function", [("name", Identifier), ("body", Return)])
+Program = NamedTuple("Program", [("function_definition", Function)])
 
 
 # This will remove the first element of tokens and pops it off. Modifies tokens
-def expect(pattern: re.Pattern, tokens: List[str]) -> str:
+def expect(expected_type: TokenType, tokens: List[Token]) -> Token:
     if not tokens:
         raise SyntaxError("Unexpected end of input")
-    expected = tokens.pop(0)
-    if not pattern.match(expected):
-        raise SyntaxError(f"Syntax Error: Expected {pattern.pattern}, got {expected}")
-    return expected
+    tok = tokens.pop(0)
+    if expected_type != tok.type:
+        raise SyntaxError(f"Syntax Error: Expected {expected_type}, got {tok}")
+    return tok
 
 
-def parse_exp(tokens: List[str]) -> Constant:
+def parse_exp(tokens: List[Token]) -> Constant:
     # <exp> ::= <int>
     if not tokens:
         raise SyntaxError("Unexpected end of input.")
 
-    val = tokens.pop(0)
+    tok = tokens.pop(0)
 
-    if not TOKEN_REGEXES["CONSTANT"].match(val):
-        raise SyntaxError(f"Expected constant, got {val}")
+    if tok.type != TokenType.CONSTANT:
+        raise SyntaxError(f"Expected constant, got {tok}")
 
-    return Constant(int(val))
+    return Constant(int(tok.value))
 
 
-def parse_statement(tokens: List[str]) -> Return:
+def parse_statement(tokens: List[Token]) -> Return:
     # <statement> ::= "return" <constant> ";"
     if not tokens:
         raise SyntaxError("Unexpected end of input.")
 
-    expect(TOKEN_REGEXES["RETURN"], tokens)
+    expect(TokenType.RETURN, tokens)
     return_val = parse_exp(tokens)
-    expect(TOKEN_REGEXES["SEMICOLON"], tokens)
+    expect(TokenType.SEMICOLON, tokens)
 
     return Return(return_val)
 
 
-def parse_identifier(tokens: List[str]) -> Identifier:
+def parse_identifier(tokens: List[Token]) -> Identifier:
     # <identifier> ::= ? An identifier token ?
     if not tokens:
         raise SyntaxError("Unexpected end of input.")
 
-    identifier_name = tokens.pop(0)
+    tok = tokens.pop(0)
 
-    if not TOKEN_REGEXES["IDENTIFIER"].match(identifier_name):
-        raise SyntaxError(f"Expected identifier, got {identifier_name}")
+    if tok.type != TokenType.IDENTIFIER:
+        raise SyntaxError(f"Expected identifier, got {tok}")
 
-    return Identifier(identifier_name)
+    return Identifier(tok.value)
 
 
-def parse_function(tokens: List[str]) -> Function:
+def parse_function(tokens: List[Token]) -> Function:
     # <function> ::= "int" <identifier> "(" "void" ")" "{" <statement> "}"
     if not tokens:
         raise SyntaxError("Unexpected enf of input.")
 
-    expect(TOKEN_REGEXES["INT_KEYWORD"], tokens)
+    expect(TokenType.INT_KEYWORD, tokens)
     identifier = parse_identifier(tokens)
-    expect(TOKEN_REGEXES["L_PAREN"], tokens)
-    expect(TOKEN_REGEXES["VOID_KEYWORD"], tokens)
-    expect(TOKEN_REGEXES["R_PAREN"], tokens)
-    expect(TOKEN_REGEXES["L_BRACE"], tokens)
+    expect(TokenType.L_PAREN, tokens)
+    expect(TokenType.VOID_KEYWORD, tokens)
+    expect(TokenType.R_PAREN, tokens)
+    expect(TokenType.L_BRACE, tokens)
     statement = parse_statement(tokens)
-    expect(TOKEN_REGEXES["R_BRACE"], tokens)
+    expect(TokenType.R_BRACE, tokens)
 
     return Function(name=identifier, body=statement)
 
 
-def parse_program(tokens: List[str]) -> Program:
+def parse_program(tokens: List[Token]) -> Program:
     # <program> ::= <function>
     main = parse_function(tokens)
 

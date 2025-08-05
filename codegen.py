@@ -10,7 +10,7 @@ from ast2asm import (
 )
 
 
-def emit_assembly(node: AssemblyProgram) -> List[str]:
+def emit_assembly(node: AssemblyProgram | AssemblyFunction) -> List[str]:
     match node:
         case AssemblyProgram(function_definition=func):
             return emit_assembly(func)

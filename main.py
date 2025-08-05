@@ -9,7 +9,7 @@ from codegen import emit_assembly
 from lexer import lex
 
 
-def create_pretty_tuple_str(obj, indent=0) -> str:
+def create_pretty_tuple_str(obj: NamedTuple, indent=0) -> str:
     spacer = " " * (indent + 2)
     if isinstance(obj, list):
         if not obj:
@@ -52,7 +52,7 @@ def main():
         program = "".join([line.strip() for line in f.readlines()])
 
     if args.stage == "lex":
-        print(lex(program))
+        print(*lex(program), sep="\n")
     elif args.stage == "parse":
         print(create_pretty_tuple_str(parse_program(lex(program))))
     elif args.stage == "codegen":
