@@ -4,9 +4,7 @@ from typing import Any, List, NamedTuple
 AssemblyFunction = NamedTuple(
     "AssemblyFunction", [("name", str), ("instructions", List[Any])]
 )  # Should ideally remove the Any
-AssemblyProgram = NamedTuple(
-    "AssemblyProgram", [("function_definition", AssemblyFunction)]
-)
+AssemblyProgram = NamedTuple("AssemblyProgram", [("function_definition", AssemblyFunction)])
 AssemblyImmediate = NamedTuple("AssemblyImmediate", [("value", int | str)])
 AssemblyMov = NamedTuple("AssemblyMov", [("exp", AssemblyImmediate), ("Register", str)])
 AssemblyPop = NamedTuple("AssemblyPop", [("Register", str)])

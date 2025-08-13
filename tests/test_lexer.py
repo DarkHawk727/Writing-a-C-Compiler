@@ -10,9 +10,7 @@ class LexerTest(unittest.TestCase):
             return 1;
         }
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "1", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "1", ";", "}"])
 
     def test_multi_digit(self):
         prog = """
@@ -21,9 +19,7 @@ class LexerTest(unittest.TestCase):
             return 69;
         }
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "69", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "69", ";", "}"])
 
     def test_allman_braces(self):
         prog = """
@@ -38,17 +34,13 @@ class LexerTest(unittest.TestCase):
         ;
         }
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "0", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "0", ";", "}"])
 
     def test_no_newlines(self):
         prog = """
         int main(void) {return 69;}
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "69", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "69", ";", "}"])
 
     def test_return_zero(self):
         prog = """
@@ -57,9 +49,7 @@ class LexerTest(unittest.TestCase):
             return 0;
         }
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "0", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "0", ";", "}"])
 
     def test_return_2(self):
         prog = """
@@ -68,25 +58,19 @@ class LexerTest(unittest.TestCase):
             return 2;
         }
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "2", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "2", ";", "}"])
 
     def test_spaces(self):
         prog = """
           int   main(   void )   {    return 69 ; } 
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "69", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "69", ";", "}"])
 
     def test_tabs(self):
         prog = """
         int    main    (    void)    {       return  0    ;    }    
         """
-        self.assertListEqual(
-            lex(prog), ["int", "main", "(", "void", ")", "{", "return", "0", ";", "}"]
-        )
+        self.assertListEqual(lex(prog), ["int", "main", "(", "void", ")", "{", "return", "0", ";", "}"])
 
     def test_at_sign(self):
         prog = """

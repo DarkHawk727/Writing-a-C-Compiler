@@ -13,6 +13,9 @@ class TokenType(Enum):
     L_BRACE = auto()
     R_BRACE = auto()
     SEMICOLON = auto()
+    COMPLEMENT = auto()
+    NEGATION = auto()
+    DECREMENT = auto()
 
 
 Token = NamedTuple("Token", [("type", TokenType), ("value", "str")])

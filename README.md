@@ -11,7 +11,7 @@ This repo contains a Python implementation of a C compiler following [Writing a 
 ## Usage
 
 ```text
-usage: main.py [-h] [--stage {lex,parse,codegen,compile}] file
+usage: main.py [-h] [--stage {lex,parse,tacky,codegen,compile}] file
 
 Compiler with stage selection
 

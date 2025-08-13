@@ -25,11 +25,7 @@ def emit_assembly(node: AssemblyProgram | AssemblyFunction) -> List[str]:
             exp_code = emit_assembly(exp)[0]
             if reg == "eax":
                 return [f"\tmovl  {exp_code}, %eax"]
-            elif (
-                reg == "rbp"
-                and isinstance(exp, AssemblyImmediate)
-                and exp.value == "rsp"
-            ):
+            elif reg == "rbp" and isinstance(exp, AssemblyImmediate) and exp.value == "rsp":
                 return ["\tpushq  %rbp", "\tmovq  %rsp, %rbp"]
             else:
                 return [f"\tmovq  {exp_code}, %{reg}"]

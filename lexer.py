@@ -4,16 +4,19 @@ from typing import List
 from tokens import Token, TokenType
 
 TOKEN_REGEXES = {
-    TokenType.CONSTANT: re.compile(r"[0-9]+\b"),  # CONSTANT
-    TokenType.INT_KEYWORD: re.compile(r"int\b"),  # INTEGER
-    TokenType.VOID_KEYWORD: re.compile(r"void\b"),  # VOID
-    TokenType.RETURN: re.compile(r"return\b"),  # RETURN
-    TokenType.L_PAREN: re.compile(r"\("),  # L_PAREN
-    TokenType.R_PAREN: re.compile(r"\)"),  # R_PAREN
-    TokenType.L_BRACE: re.compile(r"{"),  # L_BRACE
-    TokenType.R_BRACE: re.compile(r"}"),  # R_BRACE
-    TokenType.SEMICOLON: re.compile(r";"),  # SEMICOLON
-    TokenType.IDENTIFIER: re.compile(r"[a-zA-Z]\w*\b"),  # IDENTIFIER
+    TokenType.CONSTANT: re.compile(r"[0-9]+\b"),
+    TokenType.INT_KEYWORD: re.compile(r"int\b"),
+    TokenType.VOID_KEYWORD: re.compile(r"void\b"),
+    TokenType.RETURN: re.compile(r"return\b"),
+    TokenType.L_PAREN: re.compile(r"\("),
+    TokenType.R_PAREN: re.compile(r"\)"),
+    TokenType.L_BRACE: re.compile(r"{"),
+    TokenType.R_BRACE: re.compile(r"}"),
+    TokenType.SEMICOLON: re.compile(r";"),
+    TokenType.IDENTIFIER: re.compile(r"[a-zA-Z]\w*\b"),
+    TokenType.COMPLEMENT: re.compile(r"~"),
+    TokenType.DECREMENT: re.compile(r"--"),
+    TokenType.NEGATION: re.compile(r"-"),
 }
 
 
