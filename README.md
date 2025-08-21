@@ -4,6 +4,45 @@ This repo contains a Python implementation of a C compiler following [Writing a 
 
 [Eventually, describe the optimizations it makes and maybe some benchmarks and limitations.]
 
+## File Structure
+
+TBA
+
+## Compiler Architecture
+
+```mermaid
+flowchart TD
+    A@{ shape: doc, label: "program.c" } -->|input| B[Lexer]
+    B -->|Token list| D[Parser]
+    D -->|AST| SA
+
+    %% Semantic Analysis Subgraph
+    subgraph SA[Semantic analysis]
+      direction TB
+      SA1[Identifier resolution] --> SA2[Type checking] --> SA3[Loop labeling]
+    end
+    SA -->|Transformed AST| H[TACKY generation]
+
+    H -->|TACKY| OPT
+
+    %% Optimization Subgraph
+    subgraph OPT[Optimization]
+      direction TB
+      O1[Constant folding] --> O2[Unreachable code elimination] --> O3[Copy propagation] --> O4[Dead store elimination]
+      O4 --> O1
+    end
+    OPT -->|Optimized TACKY| AG
+
+    %% Assembly Generation Subgraph
+    subgraph AG[Assembly generation]
+      direction TB
+      AG1[Converting TACKY to assembly] --> AG2[Register allocation] --> AG3[Replacing pseudo-operands] --> AG4[Instruction fix-up]
+    end
+    AG -->|Assembly| N[Code emission]
+
+    N --> O@{ shape: doc, label: "program.s" }
+```
+
 ## Limitations
 
 - Can only compile the simplest programs (just returns a single number)
