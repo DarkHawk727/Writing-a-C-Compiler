@@ -21,7 +21,12 @@ def emit_assembly(node: AssemblyProgram | AssemblyFunction) -> List[str]:
             return emit_assembly(func)
 
         case AssemblyFunction(name, instructions):
-            lines = [f"\t.globl {name}", f"_{name}:", "\tpushq\t%rbp", "\tmovq\t%rsp, %rbp"]
+            lines = [
+                f"\t.globl {name}",
+                f"_{name}:",
+                "\tpushq\t%rbp",
+                "\tmovq\t%rsp, %rbp",
+            ]
             for instr in instructions:
                 lines.extend(emit_assembly(instr))
             return lines

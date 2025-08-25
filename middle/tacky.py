@@ -1,7 +1,7 @@
 from itertools import count
-from frontend.parser import Complement, Constant, Function, Negation, Program, Return, UnaryOp
 from typing import Any, List
 
+from frontend.parser import Complement, Constant, Function, Negation, Program, UnaryOp
 from middle.tacky_ir import *
 
 _temp_counter = count(0)

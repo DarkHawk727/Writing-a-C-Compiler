@@ -17,7 +17,6 @@ class OffsetAllocator(dict):
         return offset
 
 
-
 class AssemblyFunction(NamedTuple):
     name: str
     instructions: List[Any]
