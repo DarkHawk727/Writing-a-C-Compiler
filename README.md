@@ -6,7 +6,36 @@ This repo contains a Python implementation of a C compiler following [Writing a 
 
 ## File Structure
 
-TBA
+```text
+.
+├── backend/
+│   ├── assembly_ir.py
+│   ├── codegen.py
+│   └── tacky2asm.py
+├── frontend/
+│   ├── ast_ir.py
+│   ├── lexer.py
+│   ├── parser.py
+│   └── tokens.py
+├── middle/
+│   ├── tacky.py
+│   └── tacky_ir.py
+├── tests/
+│   ├── inputs/
+│   │   ├── simple_return.c
+│   │   └── unary_operators.c
+│   ├── outputs/
+│   │   ├── simple_return.s
+│   │   └── unary_operators.s
+│   ├── test_codegen.py
+│   ├── test_lexer.py
+│   └── test_parser.py 
+├── util/
+│   └── viz.py
+├── .gitignore
+├── README.md
+└── main.py
+```
 
 ## Compiler Architecture
 
