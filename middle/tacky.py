@@ -1,23 +1,8 @@
 from itertools import count
-from parser import Complement, Constant, Function, Negation, Program, Return, UnaryOp
-from typing import Any, List, NamedTuple
+from frontend.parser import Complement, Constant, Function, Negation, Program, Return, UnaryOp
+from typing import Any, List
 
-TACKYConstant = NamedTuple("TACKYConstant", [("value", int)])
-TACKYVariable = NamedTuple("TACKYVariable", [("identifier", str)])
-TACKYValue = TACKYConstant | TACKYVariable
-TACKYUnaryOp = NamedTuple(
-    "TACKYUnaryOp",
-    [
-        ("unary_operator", Complement | Negation),
-        ("source", TACKYValue),
-        ("destination", TACKYValue),
-    ],
-)
-TACKYReturn = NamedTuple("TACKYReturn", [("value", TACKYValue)])
-TACKYInstruction = TACKYReturn | TACKYUnaryOp
-TACKYFunction = NamedTuple("TACKYFunction", [("identifier", str), ("instructions", List[TACKYInstruction])])
-TACKYProgram = NamedTuple("TACKYProgram", [("function_definition", TACKYFunction)])
-
+from middle.tacky_ir import *
 
 _temp_counter = count(0)
 

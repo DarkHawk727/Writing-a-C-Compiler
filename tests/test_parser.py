@@ -1,5 +1,5 @@
 import unittest
-from parser import Constant, Function, Identifier, Program, Return, parse_program
+from frontend.parser import Constant, Function, Identifier, Program, Return, parse_program
 
 
 # Imagine's that input has already be correctly tokenized

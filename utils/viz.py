@@ -1,4 +1,4 @@
-from parser import (
+from frontend.parser import (
     Complement,
     Constant,
     Function,

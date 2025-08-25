@@ -1,13 +1,13 @@
 #!/opt/homebrew/bin/python3.10
 import argparse
 import os
-from parser import parse_program
 
-from ast2asm import convert_AST_to_assembly
-from codegen import emit_assembly
-from lexer import lex
-from tacky import convert_AST_to_TACKY
-from viz import pretty_print_tree
+from backend.codegen import emit_assembly
+from backend.tacky2asm import convert_TACKY_to_assembly
+from frontend.lexer import lex
+from frontend.parser import parse_program
+from middle.tacky import convert_AST_to_TACKY
+from utils.viz import pretty_print_tree
 
 
 def main():
@@ -36,10 +36,20 @@ def main():
     elif args.stage == "tacky":
         print(pretty_print_tree(convert_AST_to_TACKY(parse_program(lex(program)))))
     elif args.stage == "codegen":
-        print(pretty_print_tree(convert_AST_to_assembly(parse_program(lex(program)))))
+        print(
+            pretty_print_tree(
+                convert_TACKY_to_assembly(
+                    convert_AST_to_TACKY(parse_program(lex(program)))
+                )
+            )
+        )
     elif args.stage == "compile":
         with open(f"{args.file[:-2]}.s", "w") as out:
-            for instruction in emit_assembly(convert_AST_to_assembly(parse_program(lex(program)))):
+            for instruction in emit_assembly(
+                convert_TACKY_to_assembly(
+                    convert_AST_to_TACKY(parse_program(lex(program)))
+                )
+            ):
                 out.write(instruction + "\n")
 
 

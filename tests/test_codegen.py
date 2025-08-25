@@ -1,7 +1,7 @@
 import unittest
 
-from ast2asm import convert_AST_to_assembly
-from parser import Constant, Function, Identifier, Program, Return
+from backend.tacky2asm import convert_AST_to_assembly
+from frontend.parser import Constant, Function, Identifier, Program, Return
 
 
 class CodeGenTest(unittest.TestCase):

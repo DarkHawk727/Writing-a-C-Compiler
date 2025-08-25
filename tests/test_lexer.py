@@ -1,6 +1,6 @@
 import unittest
 
-from lexer import lex
+from frontend.lexer import lex
 
 
 class LexerTest(unittest.TestCase):
