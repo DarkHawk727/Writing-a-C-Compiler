@@ -4,39 +4,6 @@ This repo contains a Python implementation of a C compiler following [Writing a 
 
 [Eventually, describe the optimizations it makes and maybe some benchmarks and limitations.]
 
-## File Structure
-
-```text
-.
-├── backend/
-│   ├── assembly_ir.py
-│   ├── codegen.py
-│   └── tacky2asm.py
-├── frontend/
-│   ├── ast_ir.py
-│   ├── lexer.py
-│   ├── parser.py
-│   └── tokens.py
-├── middle/
-│   ├── tacky.py
-│   └── tacky_ir.py
-├── tests/
-│   ├── inputs/
-│   │   ├── simple_return.c
-│   │   └── unary_operators.c
-│   ├── outputs/
-│   │   ├── simple_return.s
-│   │   └── unary_operators.s
-│   ├── test_codegen.py
-│   ├── test_lexer.py
-│   └── test_parser.py 
-├── util/
-│   └── viz.py
-├── .gitignore
-├── README.md
-└── main.py
-```
-
 ## Compiler Architecture
 
 ```mermaid
@@ -90,4 +57,17 @@ options:
   -h, --help            show this help message and exit
   --stage {lex,parse,codegen,compile}
                         Select the compiler stage to run (default: compile)
+```
+
+## TACKY
+
+This compiler uses an intermediate representation inspired by Three-Address Code (TAC) called TACKY. TACKY works by breaking expressions down into simple statements of the form: `tmp_x = y (op) z` where `y` and `z` are either TACKY variables (denotes `tmp_a`) or numbers. For example the TACKY for `(10 - (6 % 4) * 3 + 8 / 2) % 5` is:
+
+```text
+tmp_0 = 6 % 4
+tmp_1 = tmp_0 * 3
+tmp_2 = 8 / 2
+tmp_3 = 10 - tmp_1
+tmp_4 = tmp_3 + tmp_2
+tmp_5 = tmp_4 % 5
 ```

@@ -1,14 +1,23 @@
-from frontend.parser import (
-    Complement,
-    Constant,
-    Function,
-    Identifier,
-    Negation,
-    Program,
-    Return,
-    UnaryOp,
+from typing import Any, List, NamedTuple
+
+from middle.tacky_ir import (
+    TACKYAdd,
+    TACKYBinaryOp,
+    TACKYComplement,
+    TACKYConstant,
+    TACKYDivide,
+    TACKYFunction,
+    TACKYInstruction,
+    TACKYMultiply,
+    TACKYNegation,
+    TACKYProgram,
+    TACKYRemainder,
+    TACKYReturn,
+    TACKYSubtract,
+    TACKYUnaryOp,
+    TACKYValue,
+    TACKYVariable,
 )
-from typing import Any, Literal, NamedTuple
 
 
 def is_namedtuple_instance(x: Any) -> bool:
@@ -22,7 +31,11 @@ def is_primitive(x: Any) -> bool:
 def node_label(x: Any) -> str:
     if is_namedtuple_instance(x):
         cls = "**" + x.__class__.__name__ + "**"
-        prims = [f"{f}={repr(getattr(x, f))}" for f in x._fields if is_primitive(getattr(x, f))]
+        prims = [
+            f"{f}={repr(getattr(x, f))}"
+            for f in x._fields
+            if is_primitive(getattr(x, f))
+        ]
         return cls if not prims else cls + "\\n" + "\\n".join(prims)
     if is_primitive(x):
         return repr(x)
@@ -89,3 +102,60 @@ def pretty_print_tree(root: NamedTuple, indent=0) -> str:
         return result
     else:
         return repr(root)
+
+
+def _val(v: TACKYValue) -> str:
+    if isinstance(v, TACKYConstant):
+        return str(v.value)
+    elif isinstance(v, TACKYVariable):
+        return v.identifier
+    raise TypeError(f"Unknown TACKY value: {v!r}")
+
+
+def _uop_symbol(u) -> str:
+    if isinstance(u, TACKYComplement):
+        return "~"
+    if isinstance(u, TACKYNegation):
+        return "-"
+    raise TypeError(f"Unknown unary op: {u!r}")
+
+
+def _bop_symbol(b) -> str:
+    if isinstance(b, TACKYAdd):
+        return "+"
+    if isinstance(b, TACKYSubtract):
+        return "-"
+    if isinstance(b, TACKYMultiply):
+        return "*"
+    if isinstance(b, TACKYDivide):
+        return "/"
+    if isinstance(b, TACKYRemainder):
+        return "%"
+    raise TypeError(f"Unknown binary op: {b!r}")
+
+
+def pretty_tacky(obj: TACKYProgram | TACKYFunction, show_return: bool = True) -> str:
+    """Return a compact three-address listing of a TACKYProgram or TACKYFunction."""
+    if isinstance(obj, TACKYProgram):
+        fn = obj.function_definition
+    else:
+        fn = obj
+
+    lines: List[str] = []
+    for instr in fn.instructions:
+        if isinstance(instr, TACKYUnaryOp):
+            dst = _val(instr.destination)
+            src = _val(instr.source)
+            lines.append(f"{dst} = {_uop_symbol(instr.unary_operator)}{src}")
+        elif isinstance(instr, TACKYBinaryOp):
+            dst = _val(instr.destination)
+            s1 = _val(instr.source_1)
+            s2 = _val(instr.source_2)
+            lines.append(f"{dst} = {s1} {_bop_symbol(instr.binary_operator)} {s2}")
+        elif isinstance(instr, TACKYReturn) and show_return:
+            lines.append(f"return {_val(instr.value)}")
+        else:
+            # ignore return if show_return=False
+            continue
+
+    return "\n".join(lines)

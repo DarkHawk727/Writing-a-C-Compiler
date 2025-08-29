@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import itertools
-from typing import Any, List, Literal, NamedTuple
+from typing import Any, List, Literal, NamedTuple, TypeAlias
 
 
 class OffsetAllocator(dict):
@@ -33,7 +33,7 @@ class AssemblyImmediate(NamedTuple):
 
 class AssemblyMov(NamedTuple):
     exp: AssemblyRegister | AssemblyImmediate | AssemblyPseudoRegister | AssemblyStack
-    register: AssemblyRegister | AssemblyPseudoRegister | AssemblyStack
+    register: Operand
 
 
 class AssemblyPop(NamedTuple):
@@ -54,15 +54,23 @@ class AssemblyComplement(NamedTuple):
 
 class AssemblyUnary(NamedTuple):
     unary_operator: AssemblyNegation | AssemblyComplement
-    operand: Any
+    operand: Operand
 
 
-class AssemblyAllocateStack(NamedTuple):
-    val: int
+class AssemblySubtract(NamedTuple):
+    pass
+
+
+class AssemblyMultiply(NamedTuple):
+    pass
+
+
+class AssemblyAdd(NamedTuple):
+    pass
 
 
 class AssemblyRegister(NamedTuple):
-    reg: Literal["AX", "R10"]
+    reg: Literal["AX", "R10", "DX", "R10", "R11"]
 
 
 class AssemblyStack(NamedTuple):
@@ -71,3 +79,27 @@ class AssemblyStack(NamedTuple):
 
 class AssemblyPseudoRegister(NamedTuple):
     identifier: str
+
+
+Operand: TypeAlias = (
+    AssemblyImmediate | AssemblyRegister | AssemblyPseudoRegister | AssemblyStack
+)
+
+
+class AssemblyBinaryOp(NamedTuple):
+    binary_operator: AssemblyAdd | AssemblySubtract | AssemblyMultiply
+    operand_1: Operand
+    operand_2: Operand
+
+
+class AssemblyIDiv(NamedTuple):
+    operand: Operand
+
+
+# Convert Doubleword to Quadword
+class AssemblyCdq(NamedTuple):
+    pass
+
+
+class AssemblyAllocateStack(NamedTuple):
+    val: int

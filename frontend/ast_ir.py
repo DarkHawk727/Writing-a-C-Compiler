@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal, NamedTuple, Union
+from typing import Literal, NamedTuple
 
 
 class Constant(NamedTuple):
@@ -32,9 +32,35 @@ class Negation(NamedTuple):
     operator: Literal["-"]
 
 
+class Add(NamedTuple):
+    operator: Literal["+"]
+
+
+class Subtract(NamedTuple):
+    operator: Literal["-"]
+
+
+class Multiply(NamedTuple):
+    operator: Literal["*"]
+
+
+class Divide(NamedTuple):
+    operator: Literal["/"]
+
+
+class Remainder(NamedTuple):
+    operator: Literal["%"]
+
+
 class UnaryOp(NamedTuple):
-    operator: Union[Complement, Negation]
+    operator: Complement | Negation
     inner_exp: Expression
 
 
-Expression = Union[Constant, UnaryOp]
+class BinaryOp(NamedTuple):
+    operator: Add | Subtract | Multiply | Divide | Remainder
+    l_exp: Expression
+    r_exp: Expression
+
+
+Expression = Constant | UnaryOp | BinaryOp

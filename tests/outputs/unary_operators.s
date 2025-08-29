@@ -1,4 +1,4 @@
-    .globl main
+    .globl _main
 main:
     pushq   %rbp
     movq    %rsp, %rbp

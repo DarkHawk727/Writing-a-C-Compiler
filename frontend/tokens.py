@@ -14,8 +14,12 @@ class TokenType(Enum):
     R_BRACE = auto()
     SEMICOLON = auto()
     COMPLEMENT = auto()
-    NEGATION = auto()
     DECREMENT = auto()
+    PLUS_SIGN = auto()
+    ASTERISK = auto()
+    FORWARD_SLASH = auto()
+    MINUS_SIGN = auto()
+    PERCENT_SIGN = auto()
 
 
 Token = NamedTuple("Token", [("type", TokenType), ("value", "str")])

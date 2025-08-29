@@ -16,7 +16,11 @@ TOKEN_REGEXES = {
     TokenType.IDENTIFIER: re.compile(r"[a-zA-Z]\w*\b"),
     TokenType.COMPLEMENT: re.compile(r"~"),
     TokenType.DECREMENT: re.compile(r"--"),
-    TokenType.NEGATION: re.compile(r"-"),
+    TokenType.MINUS_SIGN: re.compile(r"-"),
+    TokenType.PLUS_SIGN: re.compile(r"\+"),
+    TokenType.ASTERISK: re.compile(r"\*"),
+    TokenType.FORWARD_SLASH: re.compile(r"/"),
+    TokenType.PERCENT_SIGN: re.compile(r"%"),
 }
 
 

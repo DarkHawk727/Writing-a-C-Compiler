@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import List, NamedTuple, TypeAlias, Union
-
-from frontend.parser import Complement, Negation
+from typing import List, Literal, NamedTuple, TypeAlias
 
 
 class TACKYConstant(NamedTuple):
@@ -13,20 +11,57 @@ class TACKYVariable(NamedTuple):
     identifier: str
 
 
-TACKYValue: TypeAlias = Union[TACKYConstant, TACKYVariable]
+TACKYValue: TypeAlias = TACKYConstant | TACKYVariable
+
+
+class TACKYComplement(NamedTuple):
+    op: Literal["~"]
+
+
+class TACKYNegation(NamedTuple):
+    op: Literal["-"]
+
+
+class TACKYAdd(NamedTuple):
+    op: Literal["+"]
+
+
+class TACKYSubtract(NamedTuple):
+    op: Literal["-"]
+
+
+class TACKYMultiply(NamedTuple):
+    op: Literal["*"]
+
+
+class TACKYDivide(NamedTuple):
+    op: Literal["/"]
+
+
+class TACKYRemainder(NamedTuple):
+    op: Literal["%"]
 
 
 class TACKYUnaryOp(NamedTuple):
-    unary_operator: Union[Complement, Negation]
+    unary_operator: TACKYComplement | TACKYNegation
     source: TACKYValue
-    destination: TACKYVariable
+    destination: TACKYValue
+
+
+class TACKYBinaryOp(NamedTuple):
+    binary_operator: (
+        TACKYAdd | TACKYSubtract | TACKYMultiply | TACKYDivide | TACKYRemainder
+    )
+    source_1: TACKYValue
+    source_2: TACKYValue
+    destination: TACKYValue
 
 
 class TACKYReturn(NamedTuple):
     value: TACKYValue
 
 
-TACKYInstruction: TypeAlias = Union[TACKYReturn, TACKYUnaryOp]
+TACKYInstruction: TypeAlias = TACKYReturn | TACKYUnaryOp
 
 
 class TACKYFunction(NamedTuple):
