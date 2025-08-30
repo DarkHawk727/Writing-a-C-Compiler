@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+from enum import Enum, auto
 from typing import Any, List, Literal, NamedTuple, TypeAlias
 
 
@@ -44,29 +45,14 @@ class AssemblyRet(NamedTuple):
     pass
 
 
-class AssemblyNegation(NamedTuple):
-    pass
-
-
-class AssemblyComplement(NamedTuple):
-    pass
+class AssemblyUnaryOpType(Enum):
+    COMPLEMENT = auto()
+    NEGATION = auto()
 
 
 class AssemblyUnary(NamedTuple):
-    unary_operator: AssemblyNegation | AssemblyComplement
+    unary_operator: AssemblyUnaryOpType
     operand: Operand
-
-
-class AssemblySubtract(NamedTuple):
-    pass
-
-
-class AssemblyMultiply(NamedTuple):
-    pass
-
-
-class AssemblyAdd(NamedTuple):
-    pass
 
 
 class AssemblyRegister(NamedTuple):
@@ -86,8 +72,19 @@ Operand: TypeAlias = (
 )
 
 
+class AssemblyBinaryOpType(Enum):
+    ADD = auto()
+    SUBTRACT = auto()
+    MULTIPLY = auto()
+    BITWISE_AND = auto()
+    BITWISE_OR = auto()
+    BITWISE_XOR = auto()
+    L_SHIFT = auto()
+    R_SHIFT = auto()
+
+
 class AssemblyBinaryOp(NamedTuple):
-    binary_operator: AssemblyAdd | AssemblySubtract | AssemblyMultiply
+    binary_operator: AssemblyBinaryOpType
     operand_1: Operand
     operand_2: Operand
 

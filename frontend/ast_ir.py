@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Literal, NamedTuple
-
+from enum import Enum, auto
+from typing import NamedTuple
 
 class Constant(NamedTuple):
     val: int
@@ -24,41 +24,31 @@ class Program(NamedTuple):
     function_definition: Function
 
 
-class Complement(NamedTuple):
-    operator: Literal["~"]
-
-
-class Negation(NamedTuple):
-    operator: Literal["-"]
-
-
-class Add(NamedTuple):
-    operator: Literal["+"]
-
-
-class Subtract(NamedTuple):
-    operator: Literal["-"]
-
-
-class Multiply(NamedTuple):
-    operator: Literal["*"]
-
-
-class Divide(NamedTuple):
-    operator: Literal["/"]
-
-
-class Remainder(NamedTuple):
-    operator: Literal["%"]
+class UnaryOpType(Enum):
+    NEGATION = auto()
+    COMPLEMENT = auto()
 
 
 class UnaryOp(NamedTuple):
-    operator: Complement | Negation
+    operator: UnaryOpType
     inner_exp: Expression
 
 
+class BinaryOpType(Enum):
+    ADD = auto()
+    SUBTRACT = auto()
+    MULTIPLY = auto()
+    DIVIDE = auto()
+    REMAINDER = auto()
+    BITWISE_AND = auto()
+    BITWISE_OR = auto()
+    BITWISE_XOR = auto()
+    L_SHIFT = auto()
+    R_SHIFT = auto()
+
+
 class BinaryOp(NamedTuple):
-    operator: Add | Subtract | Multiply | Divide | Remainder
+    operator: BinaryOpType
     l_exp: Expression
     r_exp: Expression
 

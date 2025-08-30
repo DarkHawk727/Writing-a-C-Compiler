@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Literal, NamedTuple, TypeAlias
+from enum import Enum, auto
+from typing import List, NamedTuple, TypeAlias
 
 
 class TACKYConstant(NamedTuple):
@@ -14,44 +15,32 @@ class TACKYVariable(NamedTuple):
 TACKYValue: TypeAlias = TACKYConstant | TACKYVariable
 
 
-class TACKYComplement(NamedTuple):
-    op: Literal["~"]
-
-
-class TACKYNegation(NamedTuple):
-    op: Literal["-"]
-
-
-class TACKYAdd(NamedTuple):
-    op: Literal["+"]
-
-
-class TACKYSubtract(NamedTuple):
-    op: Literal["-"]
-
-
-class TACKYMultiply(NamedTuple):
-    op: Literal["*"]
-
-
-class TACKYDivide(NamedTuple):
-    op: Literal["/"]
-
-
-class TACKYRemainder(NamedTuple):
-    op: Literal["%"]
+class TACKYUnaryOpType(Enum):
+    COMPLEMENT = auto()
+    NEGATION = auto()
 
 
 class TACKYUnaryOp(NamedTuple):
-    unary_operator: TACKYComplement | TACKYNegation
+    unary_operator: TACKYUnaryOpType
     source: TACKYValue
     destination: TACKYValue
 
 
+class TACKYBinaryOpType(Enum):
+    ADD = auto()
+    SUBTRACT = auto()
+    MULTIPLY = auto()
+    DIVIDE = auto()
+    REMAINDER = auto()
+    BITWISE_AND = auto()
+    BITWISE_OR = auto()
+    BITWISE_XOR = auto()
+    L_SHIFT = auto()
+    R_SHIFT = auto()
+
+
 class TACKYBinaryOp(NamedTuple):
-    binary_operator: (
-        TACKYAdd | TACKYSubtract | TACKYMultiply | TACKYDivide | TACKYRemainder
-    )
+    binary_operator: TACKYBinaryOpType
     source_1: TACKYValue
     source_2: TACKYValue
     destination: TACKYValue

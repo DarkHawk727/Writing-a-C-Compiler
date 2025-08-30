@@ -14,13 +14,18 @@ TOKEN_REGEXES = {
     TokenType.R_BRACE: re.compile(r"}"),
     TokenType.SEMICOLON: re.compile(r";"),
     TokenType.IDENTIFIER: re.compile(r"[a-zA-Z]\w*\b"),
-    TokenType.COMPLEMENT: re.compile(r"~"),
+    TokenType.TILDE: re.compile(r"~"),
     TokenType.DECREMENT: re.compile(r"--"),
     TokenType.MINUS_SIGN: re.compile(r"-"),
     TokenType.PLUS_SIGN: re.compile(r"\+"),
     TokenType.ASTERISK: re.compile(r"\*"),
     TokenType.FORWARD_SLASH: re.compile(r"/"),
     TokenType.PERCENT_SIGN: re.compile(r"%"),
+    TokenType.AMPERSAND: re.compile(r"&"),
+    TokenType.VERTICAL_BAR: re.compile(r"\|"),
+    TokenType.CARET: re.compile(r"\^"),
+    TokenType.L_SHIFT: re.compile(r"<<"),
+    TokenType.R_SHIFT: re.compile(r">>"),
 }
 
 

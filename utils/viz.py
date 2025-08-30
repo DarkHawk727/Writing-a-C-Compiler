@@ -1,20 +1,14 @@
-from typing import Any, List, NamedTuple
+from typing import Any, Dict, List, NamedTuple
 
 from middle.tacky_ir import (
-    TACKYAdd,
     TACKYBinaryOp,
-    TACKYComplement,
+    TACKYBinaryOpType,
     TACKYConstant,
-    TACKYDivide,
     TACKYFunction,
-    TACKYInstruction,
-    TACKYMultiply,
-    TACKYNegation,
     TACKYProgram,
-    TACKYRemainder,
     TACKYReturn,
-    TACKYSubtract,
     TACKYUnaryOp,
+    TACKYUnaryOpType,
     TACKYValue,
     TACKYVariable,
 )
@@ -112,30 +106,25 @@ def _val(v: TACKYValue) -> str:
     raise TypeError(f"Unknown TACKY value: {v!r}")
 
 
-def _uop_symbol(u) -> str:
-    if isinstance(u, TACKYComplement):
-        return "~"
-    if isinstance(u, TACKYNegation):
-        return "-"
-    raise TypeError(f"Unknown unary op: {u!r}")
-
-
-def _bop_symbol(b) -> str:
-    if isinstance(b, TACKYAdd):
-        return "+"
-    if isinstance(b, TACKYSubtract):
-        return "-"
-    if isinstance(b, TACKYMultiply):
-        return "*"
-    if isinstance(b, TACKYDivide):
-        return "/"
-    if isinstance(b, TACKYRemainder):
-        return "%"
-    raise TypeError(f"Unknown binary op: {b!r}")
-
-
 def pretty_tacky(obj: TACKYProgram | TACKYFunction, show_return: bool = True) -> str:
     """Return a compact three-address listing of a TACKYProgram or TACKYFunction."""
+    _BINARY_OP_MAP: Dict[TACKYBinaryOpType, str] = {
+        TACKYBinaryOpType.ADD: "+",
+        TACKYBinaryOpType.SUBTRACT: "-",
+        TACKYBinaryOpType.MULTIPLY: "*",
+        TACKYBinaryOpType.DIVIDE: "/",
+        TACKYBinaryOpType.REMAINDER: "%",
+        TACKYBinaryOpType.BITWISE_AND: "&",
+        TACKYBinaryOpType.BITWISE_OR: "|",
+        TACKYBinaryOpType.BITWISE_XOR: "^",
+        TACKYBinaryOpType.L_SHIFT: "<<",
+        TACKYBinaryOpType.R_SHIFT: ">>",
+    }
+
+    _UNARY_OP_MAP: Dict[TACKYUnaryOpType, str] = {
+        TACKYUnaryOpType.COMPLEMENT: "~",
+        TACKYUnaryOpType.NEGATION: "-",
+    }
     if isinstance(obj, TACKYProgram):
         fn = obj.function_definition
     else:
@@ -146,12 +135,12 @@ def pretty_tacky(obj: TACKYProgram | TACKYFunction, show_return: bool = True) ->
         if isinstance(instr, TACKYUnaryOp):
             dst = _val(instr.destination)
             src = _val(instr.source)
-            lines.append(f"{dst} = {_uop_symbol(instr.unary_operator)}{src}")
+            lines.append(f"{dst} = {_UNARY_OP_MAP[instr.unary_operator]}{src}")
         elif isinstance(instr, TACKYBinaryOp):
             dst = _val(instr.destination)
             s1 = _val(instr.source_1)
             s2 = _val(instr.source_2)
-            lines.append(f"{dst} = {s1} {_bop_symbol(instr.binary_operator)} {s2}")
+            lines.append(f"{dst} = {s1} {_BINARY_OP_MAP[instr.binary_operator]} {s2}")
         elif isinstance(instr, TACKYReturn) and show_return:
             lines.append(f"return {_val(instr.value)}")
         else:

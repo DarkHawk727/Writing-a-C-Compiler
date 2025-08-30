@@ -1,23 +1,20 @@
 from typing import List
 
 from backend.assembly_ir import (
-    AssemblyAdd,
     AssemblyAllocateStack,
     AssemblyBinaryOp,
+    AssemblyBinaryOpType,
     AssemblyCdq,
-    AssemblyComplement,
     AssemblyFunction,
     AssemblyIDiv,
     AssemblyImmediate,
     AssemblyMov,
-    AssemblyMultiply,
-    AssemblyNegation,
     AssemblyProgram,
     AssemblyRegister,
     AssemblyRet,
     AssemblyStack,
-    AssemblySubtract,
     AssemblyUnary,
+    AssemblyUnaryOpType,
 )
 
 
@@ -44,21 +41,40 @@ def emit_assembly(node: AssemblyProgram | AssemblyFunction) -> List[str]:
             return ["\tmovq\t%rbp, %rsp", "\tpopq\t%rbp", "\tret"]
 
         case AssemblyUnary(uop, operand):
-            if isinstance(uop, AssemblyNegation):
-                return [f"\tnegl\t{emit_assembly(operand)[0]}"]
-            elif isinstance(uop, AssemblyComplement):
-                return [f"\tnotl\t{emit_assembly(operand)[0]}"]
-            
+            operand_assembly = emit_assembly(operand)[0]
+            match uop:
+                case AssemblyUnaryOpType.NEGATION:
+                    return [f"\tnegl\t{operand_assembly}"]
+                case AssemblyUnaryOpType.COMPLEMENT:
+                    return [f"\tnotl\t{operand_assembly}"]
+
         case AssemblyBinaryOp(op, src, dst):
+            src_assembly = emit_assembly(src)[0]
+            dst_assembly = emit_assembly(dst)[0]
             match op:
-                case AssemblyAdd():
-                    return [f"\taddl\t{emit_assembly(src)[0]}, {emit_assembly(dst)[0]}"]
+                case AssemblyBinaryOpType.ADD:
+                    return [f"\taddl\t{src_assembly}, {dst_assembly}"]
 
-                case AssemblySubtract():
-                    return [f"\tsubl\t{emit_assembly(src)[0]}, {emit_assembly(dst)[0]}"]
+                case AssemblyBinaryOpType.SUBTRACT:
+                    return [f"\tsubl\t{src_assembly}, {dst_assembly}"]
 
-                case AssemblyMultiply():
-                    return [f"\timull\t{emit_assembly(src)[0]}, {emit_assembly(dst)[0]}"]
+                case AssemblyBinaryOpType.MULTIPLY:
+                    return [f"\timull\t{src_assembly}, {dst_assembly}"]
+
+                case AssemblyBinaryOpType.BITWISE_AND:
+                    return [f"\tandl\t{src_assembly}, {dst_assembly}"]
+
+                case AssemblyBinaryOpType.BITWISE_OR:
+                    return [f"\torl\t\t{src_assembly}, {dst_assembly}"]
+
+                case AssemblyBinaryOpType.BITWISE_XOR:
+                    return [f"\txorl\t{src_assembly}, {dst_assembly}"]
+
+                case AssemblyBinaryOpType.L_SHIFT:
+                    return [f"\tsall\t{src_assembly}, {dst_assembly}"]
+
+                case AssemblyBinaryOpType.R_SHIFT:
+                    return [f"\tsarl\t{src_assembly}, {dst_assembly}"]
 
         case AssemblyIDiv(operand):
             return [f"\tidivl\t{emit_assembly(operand)[0]}"]
@@ -86,4 +102,4 @@ def emit_assembly(node: AssemblyProgram | AssemblyFunction) -> List[str]:
             return [f"${val}"]
 
         case _:
-            raise NotImplementedError(f"No emit logic for {type(node).__name__}")
+            raise NotImplementedError(f"No emit logic for {node}")

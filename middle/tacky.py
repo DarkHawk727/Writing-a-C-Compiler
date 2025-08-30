@@ -1,21 +1,28 @@
 from itertools import count
-from typing import Any, List
+from typing import Any, Dict, List
 
-from frontend.parser import (
-    Add,
+from frontend.ast_ir import (
     BinaryOp,
-    Complement,
+    BinaryOpType,
     Constant,
-    Divide,
     Function,
-    Multiply,
-    Negation,
     Program,
-    Remainder,
-    Subtract,
     UnaryOp,
+    UnaryOpType,
 )
-from middle.tacky_ir import *
+from middle.tacky_ir import (
+    TACKYBinaryOp,
+    TACKYBinaryOpType,
+    TACKYConstant,
+    TACKYFunction,
+    TACKYInstruction,
+    TACKYProgram,
+    TACKYReturn,
+    TACKYUnaryOp,
+    TACKYUnaryOpType,
+    TACKYValue,
+    TACKYVariable,
+)
 
 _temp_counter = count(0)
 
@@ -24,39 +31,38 @@ def make_temp():
     return f"tmp_{next(_temp_counter)}"
 
 
-def _convert_uop(op: Complement | Negation) -> TACKYComplement | TACKYNegation:
-    match op:
-        case Complement():
-            return TACKYComplement("~")
+def _convert_uop(op: UnaryOpType) -> TACKYUnaryOpType:
+    _UNARY_OP_MAP: Dict[UnaryOpType, TACKYUnaryOpType] = {
+        UnaryOpType.COMPLEMENT: TACKYUnaryOpType.COMPLEMENT,
+        UnaryOpType.NEGATION: TACKYUnaryOpType.NEGATION,
+    }
 
-        case Negation():
-            return TACKYNegation("-")
+    try:
+        tacky_op = _UNARY_OP_MAP[op]
+    except KeyError:
+        raise TypeError(f"Unsupported binary operator: {op!r}")
+    return tacky_op
 
-        case _:
-            raise TypeError(f"Unsupported unary operator: {op.unary_operator!r}")
 
+def _convert_binaryop(op: BinaryOpType) -> TACKYBinaryOpType:
+    _BINARY_OP_MAP: Dict[BinaryOpType, TACKYBinaryOpType] = {
+        BinaryOpType.ADD: TACKYBinaryOpType.ADD,
+        BinaryOpType.SUBTRACT: TACKYBinaryOpType.SUBTRACT,
+        BinaryOpType.MULTIPLY: TACKYBinaryOpType.MULTIPLY,
+        BinaryOpType.DIVIDE: TACKYBinaryOpType.DIVIDE,
+        BinaryOpType.REMAINDER: TACKYBinaryOpType.REMAINDER,
+        BinaryOpType.BITWISE_AND: TACKYBinaryOpType.BITWISE_AND,
+        BinaryOpType.BITWISE_OR: TACKYBinaryOpType.BITWISE_OR,
+        BinaryOpType.BITWISE_XOR: TACKYBinaryOpType.BITWISE_XOR,
+        BinaryOpType.L_SHIFT: TACKYBinaryOpType.L_SHIFT,
+        BinaryOpType.R_SHIFT: TACKYBinaryOpType.R_SHIFT,
+    }
 
-def _convert_binaryop(
-    op: Add | Subtract | Multiply | Divide | Remainder,
-) -> TACKYAdd | TACKYSubtract | TACKYMultiply | TACKYDivide | TACKYRemainder:
-    match op:
-        case Add():
-            return TACKYAdd("+")
-
-        case Subtract():
-            return TACKYSubtract("-")
-
-        case Multiply():
-            return TACKYMultiply("*")
-
-        case Divide():
-            return TACKYDivide("/")
-
-        case Remainder():
-            return TACKYRemainder("%")
-
-        case _:
-            raise TypeError(f"Unsupported binary operator: {op!r}")
+    try:
+        tacky_op = _BINARY_OP_MAP[op]
+    except KeyError:
+        raise TypeError(f"Unsupported binary operator: {op!r}")
+    return tacky_op
 
 
 def emit_TACKY(expr: Any, instructions: List) -> TACKYValue:

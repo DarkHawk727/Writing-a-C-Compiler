@@ -1,23 +1,18 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List
 
 from frontend.ast_ir import (
-    Add,
     BinaryOp,
-    Complement,
+    BinaryOpType,
     Constant,
-    Divide,
     Expression,
     Function,
     Identifier,
-    Multiply,
-    Negation,
     Program,
-    Remainder,
     Return,
-    Subtract,
     UnaryOp,
+    UnaryOpType,
 )
 from frontend.tokens import Token, TokenType
 
@@ -34,18 +29,20 @@ def _expect(expected_type: TokenType, tokens: List[Token]) -> Token:
     return tok
 
 
-def _parse_uop(tokens: List[Token]) -> Complement | Negation:
+def _parse_uop(tokens: List[Token]) -> UnaryOpType:
+    _UOP_TABLE: Dict[TokenType, UnaryOpType] = {
+        TokenType.MINUS_SIGN: UnaryOpType.NEGATION,
+        TokenType.TILDE: UnaryOpType.COMPLEMENT,
+    }
     if not tokens:
         raise SyntaxError("Unexpected end of input.")
 
     tok = tokens.pop(0)
+    spec = _UOP_TABLE.get(tok.type)
+    if spec is None:
+        raise SyntaxError(f"Unknown binary operator: {tok!r}")
 
-    if tok.type == TokenType.COMPLEMENT:
-        return Complement("~")
-    elif tok.type == TokenType.MINUS_SIGN:
-        return Negation("-")
-    else:
-        raise SyntaxError(f"Malformed expression, got {tok}")
+    return spec
 
 
 def _parse_factor(tokens: List[Token]):
@@ -57,7 +54,7 @@ def _parse_factor(tokens: List[Token]):
     if tok.type == TokenType.CONSTANT:
         tokens.pop(0)
         return Constant(int(tok.value))
-    elif tok.type == TokenType.MINUS_SIGN or tok.type == TokenType.COMPLEMENT:
+    elif tok.type == TokenType.MINUS_SIGN or tok.type == TokenType.TILDE:
         op = _parse_uop(tokens)
         inner_exp = _parse_factor(tokens)
         return UnaryOp(op, inner_exp)
@@ -70,54 +67,60 @@ def _parse_factor(tokens: List[Token]):
         raise SyntaxError(f"Malformed Factor: {tok}.")
 
 
-def _parse_binop(tokens: List[Token]) -> Add | Subtract | Multiply | Divide | Remainder:
-    match tokens[0].type:
-        case TokenType.PLUS_SIGN:
-            tokens.pop(0)
-            return Add("+")
+def _parse_binop(tokens: List[Token]) -> BinaryOpType:
+    _BINOP_TABLE: dict[TokenType, BinaryOpType] = {
+        TokenType.PLUS_SIGN: BinaryOpType.ADD,
+        TokenType.MINUS_SIGN: BinaryOpType.SUBTRACT,
+        TokenType.ASTERISK: BinaryOpType.MULTIPLY,
+        TokenType.FORWARD_SLASH: BinaryOpType.DIVIDE,
+        TokenType.PERCENT_SIGN: BinaryOpType.REMAINDER,
+        TokenType.AMPERSAND: BinaryOpType.BITWISE_AND,
+        TokenType.VERTICAL_BAR: BinaryOpType.BITWISE_OR,
+        TokenType.CARET: BinaryOpType.BITWISE_XOR,
+        TokenType.L_SHIFT: BinaryOpType.L_SHIFT,
+        TokenType.R_SHIFT: BinaryOpType.R_SHIFT,
+    }
+    if not tokens:
+        raise SyntaxError("Unexpected end of input: expected a binary operator")
 
-        case TokenType.MINUS_SIGN:
-            tokens.pop(0)
-            return Subtract("-")
+    tok = tokens[0]
+    spec = _BINOP_TABLE.get(tok.type)
+    if spec is None:
+        raise SyntaxError(f"Unknown binary operator: {tok!r}")
 
-        case TokenType.ASTERISK:
-            tokens.pop(0)
-            return Multiply("*")
+    tokens.pop(0)
 
-        case TokenType.FORWARD_SLASH:
-            tokens.pop(0)
-            return Divide("/")
-
-        case TokenType.PERCENT_SIGN:
-            tokens.pop(0)
-            return Remainder("%")
-
-        case _:
-            raise SyntaxError("Unknown Binary Operator: {tokens[0]}")
+    return spec
 
 
 def _precedence(tok: Token) -> int:
     match tok.type:
-        case TokenType.PLUS_SIGN:
-            return 45
+        case TokenType.ASTERISK | TokenType.FORWARD_SLASH | TokenType.PERCENT_SIGN:
+            return 70
 
-        case TokenType.MINUS_SIGN:
-            return 45
+        case TokenType.PLUS_SIGN | TokenType.MINUS_SIGN:
+            return 60
 
-        case TokenType.ASTERISK:
-            return 50
+        case TokenType.L_SHIFT | TokenType.R_SHIFT:
+            return 55
 
-        case TokenType.FORWARD_SLASH:
-            return 50
+        case TokenType.AMPERSAND:
+            return 40
 
-        case TokenType.PERCENT_SIGN:
-            return 50
+        case TokenType.CARET:
+            return 35
+
+        case TokenType.VERTICAL_BAR:
+            return 30
 
         case _:
-            raise SyntaxError("Unknown Binary Operator: {tokens[0]}")
+            raise SyntaxError(f"Unknown Binary Operator: {tok}")
 
 
 def _parse_exp(tokens: List[Token], min_precedence) -> Expression:
+    if not tokens:
+        raise SyntaxError("Unexpected end of input.")
+
     left = _parse_factor(tokens)
     tok = tokens[0]
 
@@ -129,6 +132,11 @@ def _parse_exp(tokens: List[Token], min_precedence) -> Expression:
             TokenType.ASTERISK,
             TokenType.FORWARD_SLASH,
             TokenType.PERCENT_SIGN,
+            TokenType.AMPERSAND,
+            TokenType.VERTICAL_BAR,
+            TokenType.CARET,
+            TokenType.L_SHIFT,
+            TokenType.R_SHIFT,
         ]
         and _precedence(tok) >= min_precedence
     ):
@@ -139,31 +147,7 @@ def _parse_exp(tokens: List[Token], min_precedence) -> Expression:
     return left
 
 
-# def _parse_exp(tokens: List[Token]) -> Expression:
-#     # <exp> ::= <int> | <uop> <exp> | "(" <exp> ")"
-#     if not tokens:
-#         raise SyntaxError("Unexpected end of input.")
-
-#     tok = tokens[0]  ## Peek
-
-#     if tok.type == TokenType.CONSTANT:
-#         tokens.pop(0)
-#         return Constant(int(tok.value))
-#     elif tok.type == TokenType.COMPLEMENT or tok.type == TokenType.MINUS_SIGN:
-#         operator = _parse_uop(tokens)
-#         inner_exp = _parse_exp(tokens)
-#         return UnaryOp(operator, inner_exp)
-#     elif tok.type == TokenType.L_PAREN:
-#         tokens.pop(0)
-#         inner_exp = _parse_exp(tokens)
-#         _expect(TokenType.R_PAREN, tokens)
-#         return inner_exp
-#     else:
-#         raise SyntaxError(f"Malformed expression, got {tok}")
-
-
 def _parse_statement(tokens: List[Token]) -> Return:
-    # <statement> ::= "return" <constant> ";"
     if not tokens:
         raise SyntaxError("Unexpected end of input.")
 
@@ -175,7 +159,6 @@ def _parse_statement(tokens: List[Token]) -> Return:
 
 
 def _parse_identifier(tokens: List[Token]) -> Identifier:
-    # <identifier> ::= ? An identifier token ?
     if not tokens:
         raise SyntaxError("Unexpected end of input.")
 
@@ -188,7 +171,6 @@ def _parse_identifier(tokens: List[Token]) -> Identifier:
 
 
 def _parse_function(tokens: List[Token]) -> Function:
-    # <function> ::= "int" <identifier> "(" "void" ")" "{" <statement> "}"
     if not tokens:
         raise SyntaxError("Unexpected enf of input.")
 
@@ -205,7 +187,6 @@ def _parse_function(tokens: List[Token]) -> Function:
 
 
 def parse_program(tokens: List[Token]) -> Program:
-    # <program> ::= <function>
     main = _parse_function(tokens)
 
     if tokens:
